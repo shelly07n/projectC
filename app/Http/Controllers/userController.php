@@ -12,7 +12,7 @@ use Mail;
 class userController extends Controller
 {
     public function getUsers(){
-     $isSent = \Mail::to('simmasrfc1330@gmail.com')->send(new mailSetup());
+     $isSent = \Mail::to('1mikeset23@gmail.com')->send(new mailSetup());
      return $isSent ? "mail sent" : "not sent";
     }
 

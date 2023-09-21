@@ -22,8 +22,8 @@ class mailSetup extends Mailable
     }
 
     public function build(){
-      $result  = $this->view('dummi')
-        ->subject('dummiv-mail');
+      $result  = $this->view('Emails.invitationMail')
+        ->subject('testing');
 
         return $result;
     }

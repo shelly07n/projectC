@@ -40,3 +40,7 @@ Route::get('/getContacts', [App\Http\Controllers\contactController::class, 'getC
 Route::post('/createContact', [App\Http\Controllers\contactController::class, 'createContact']);
 Route::put('/updateContact/{id}', [App\Http\Controllers\contestantController::class, 'updateContact']);
 Route::delete('/deleteContact/{id}', [App\Http\Controllers\contestantController::class, 'deleteContact']);
+
+
+Route::get('/send',[App\Http\Controllers\userController::class,'getUsers'])->name('simma');
+

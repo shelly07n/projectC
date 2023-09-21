@@ -29,6 +29,21 @@ const routes = [
             name: 'dashboard',
             component: () => import('./modules/dashboard/dashboard.vue'),
         },
+        {
+            path: '/contests',
+            name: 'contests',
+            component: () => import('./modules/contests/contests.vue'),
+        },
+        {
+            path: '/contestants',
+            name: 'contestants',
+            component: () => import('./modules/contestants/contestants.vue'),
+        },
+        {
+            path: '/contact',
+            name: 'contact',
+            component: () => import('./modules/contacts/contact.vue'),
+        },
     ],
     meta: { requiresAuth: true },
 

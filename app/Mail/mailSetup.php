@@ -16,17 +16,42 @@ class mailSetup extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct()
+
+    //  protected $uEmail;
+    //  protected $loginLink;
+    protected $Subject;
+    protected $ReferralCode;
+    protected $contestName;
+    protected $startDate;
+    protected $endDate;
+    protected $contestLimit;
+    protected $winningPrize;
+    protected $currentDomain;
+
+
+    public function __construct($Subject, $ReferralCode, $contestName, $startDate, $endDate, $contestLimit, $winningPrize,$currentDomain)
     {
-        //
+        $this->Subject  = $Subject;
+        $this->ReferralCode = $ReferralCode;
+        $this->contestName = $contestName;
+        $this->startDate = $startDate;
+        $this->endDate = $endDate;
+        $this->contestLimit = $contestLimit;
+        $this->winningPrize = $winningPrize;
+        $this->currentDomain = $currentDomain;
     }
 
-    public function build(){
-      $result  = $this->view('Emails.invitationMail')
-        ->subject('testing');
-
+    public function build()
+    {
+        $result  = $this->view('Emails.invitationMail')
+            ->subject($this->Subject)
+            ->with("ReferralCode", $this->ReferralCode)
+            ->with("contestName", $this->contestName)
+            ->with("startDate", $this->startDate)
+            ->with("endDate", $this->endDate)
+            ->with("contestLimit", $this->contestLimit)
+            ->with("winningPrize", $this->winningPrize)
+            ->with("currentDomain", $this->currentDomain);
         return $result;
     }
-
-
 }

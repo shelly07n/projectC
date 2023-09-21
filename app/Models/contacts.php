@@ -20,11 +20,17 @@ class contacts extends Model
         'mobile',
         'email',
         'status',
+        'image'
     ];
 
 
     public function users()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getImageUrlAttribute()
+    {
+        return asset('storage/' . $this->image);
     }
 }

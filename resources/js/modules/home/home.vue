@@ -39,7 +39,7 @@ const cities = ref([
 
 
 </script>
- 
+
 <style>
 .fade-enter-active,
 .fade-leave-active {

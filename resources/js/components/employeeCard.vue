@@ -11,7 +11,10 @@
        </div>
         <div class="mt-6">
             <div class="flex justify-center">
-                <div class="rounded-full  p-2 h-16 w-16 flex justify-center items-center" :class="`${getBackgroundColor(index)}`">
+                <div v-if="source.image" class="rounded-full  p-2 h-16 w-16 flex justify-center items-center" >
+                    <img :src="source.image" alt="">
+                </div>
+                <div v-else class="rounded-full  p-2 h-16 w-16 flex justify-center items-center" :class="`${getBackgroundColor(index)}`">
                     <p class="text-gray-900 font-bold text-xl mb-2">
                         {{ source.name.charAt(0) + source.name.charAt(0) }}
                     </p>

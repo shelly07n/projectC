@@ -26,4 +26,9 @@ class contestController extends Controller
     {
         return $contestService->deleteContest($id);
     }
+    public function sentInvitation(Request $request,contestService $contestService)
+    {
+        $currentDomain = $request->getSchemeAndHttpHost();
+        return $contestService->sentInvitation($request->contestDetails,$request->userdetails,$currentDomain);
+    }
 }

@@ -27,4 +27,8 @@ class contestantController extends Controller
         // dd($request->all());
         return $contestantsService->deleteContestant($id);
     }
+    public function findUserByReferralCode(Request $request, contestantsService $contestantsService)
+    {
+        return $contestantsService->findUserByReferralCode($request->referralCode);
+    }
 }

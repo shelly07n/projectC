@@ -22,13 +22,20 @@ export const contestMainStore = defineStore("contestMainStore", () => {
         console.log(list);
         let data = []
         data.push(list)
-        axios.post("/api/createContest",data).finally(() => {
+        axios.post("/api/createContest", data).finally(() => {
             getContestList()
         })
         createContest.value = {}
     }
 
-    return{
-        createContest,contestList,getContestList,saveContest
+    const sentInvitation = (userdetails, contestDetails) => {
+        axios.post("/api/sentInvitation",
+            {
+                userdetails, contestDetails
+            })
+    }
+
+    return {
+        createContest, contestList, getContestList, saveContest, sentInvitation
     }
 })

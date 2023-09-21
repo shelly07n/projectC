@@ -20,6 +20,7 @@ return new class extends Migration
             $table->integer('mobile')->nullable();
             $table->string('email')->nullable();
             $table->string('status')->default('Not Sent');
+            $table->string('image')->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')

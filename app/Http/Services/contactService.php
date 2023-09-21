@@ -10,6 +10,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Session\SessionManager;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use \DateTime;
 
 
@@ -28,14 +29,44 @@ class contactService
     public function createContact($data)
     {
 
-        foreach ($data as $item) {
-            if ($item) {
-                contacts::create($item);
-                return response()->json(['message' => 'Records updated successfully'], 200);
-            } else {
-                return response()->json(['message' => 'Records updated failure'], 200);
+        // dd($data['image']);
+        // Handle profile image upload
+
+        // $imagePath = $data->file('image')->store('profile_images');
+        // $data->profile_image = $imagePath;
+        // dd($imagePath);
+
+        if ($data) {
+            if ($data['image']) {
+                $docUploads = request()->file('image');
+                $docUploadsName = 'doc_' . time() . '.' . $docUploads->getClientOriginalExtension();
+                $docUploadsPath = public_path('/images/');
+                $docUploads->move($docUploadsPath, $docUploadsName);
+                $data['image'] = '/images/' . $docUploadsName;
             }
+            contacts::create($data);
+            return response()->json(['message' => 'Records updated successfully'], 200);
+        } else {
+            return response()->json(['message' => 'Records updated failure'], 200);
         }
+
+
+        // foreach ($data as $item) {
+        //     if ($item) {
+        //         if ($data['image']) {
+        //             $docUploads = request()->file('image');
+        //             $docUploadsName = 'doc_'.time() . '.' . $docUploads->getClientOriginalExtension();
+        //             $docUploadsPath = public_path('/images/');
+        //             $docUploads->move($docUploadsPath, $docUploadsName);
+        //             $item[] = '/images/'.$docUploadsName;
+        //         }
+        //         dd($item);
+        //         // contacts::create($item);
+        //         return response()->json(['message' => 'Records updated successfully'], 200);
+        //     } else {
+        //         return response()->json(['message' => 'Records updated failure'], 200);
+        //     }
+        // }
     }
 
 
@@ -64,6 +95,4 @@ class contactService
         $contest->delete();
         return response()->json(['message' => 'Contest deleted successfully']);
     }
-
-
 }

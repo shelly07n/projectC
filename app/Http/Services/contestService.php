@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Mail\mailSetup;
+use App\Models\contacts;
 use App\Models\contests;
 use App\Models\User;
 use Illuminate\Support\Collection;
@@ -38,7 +40,6 @@ class contestService
                 return response()->json(['message' => 'Records updated failure'], 200);
             }
         }
-
     }
 
 
@@ -66,5 +67,42 @@ class contestService
         $contest = contests::findOrFail($id);
         $contest->delete();
         return response()->json(['message' => 'Contest deleted successfully']);
+    }
+
+    public function sentInvitation($contestDetails, $userDetails, $currentDomain)
+    {
+
+
+        $user = User::find($userDetails['user_id']);
+
+
+        $userEmail = $userDetails['email'];
+
+        $subject = "Contest Invitation";
+        $userReferralCode = $user->referral_code;
+        $contestName = $contestDetails['name'];
+        $contestStartDate = $contestDetails['start_date'];
+        $contestEndDate = $contestDetails['end_date'];
+        $contestantLimit = $contestDetails['contestant_limit'];
+        $winningPrize = $contestDetails['winning_prize'];
+
+        $isSent = \Mail::to($userEmail)->send(new mailSetup(
+            $subject,
+            $userReferralCode,
+            $contestName,
+            $contestStartDate,
+            $contestEndDate,
+            $contestantLimit,
+            $winningPrize,
+            $currentDomain
+        ));
+
+        if ($isSent) {
+            $contacts = contacts::find($userDetails['id']);
+            $contacts->update(['status' => 'Sent']);
+            return "mail sent";
+        } else {
+            return "not sent";
+        }
     }
 }

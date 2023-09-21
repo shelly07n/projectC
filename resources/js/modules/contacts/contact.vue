@@ -62,7 +62,7 @@
                 <div class="w-full  bg-white rounded ">
                     <div class="profile-pic">
                         <img class="forRounded"
-                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDnAV2195eKjdsIWb9qODnuYgxUnwJ0exESA&usqp=CAU"
+                            :src=" useStore.previewImage ? useStore.previewImage :  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDnAV2195eKjdsIWb9qODnuYgxUnwJ0exESA&usqp=CAU'"
                             srcset="" alt="" id="output" width="200" />
                         <!-- <p v-else
                                 class="font-semibold text-5xl text-center flex items-center justify-center text-white forRounded"
@@ -79,7 +79,7 @@
                             </svg>
                             <!-- <span>Change</span> -->
                         </label>
-                        <input id="file" type="file" @change="updateProfilePhoto($event)" />
+                        <input id="file" type="file" @change="useStore.profilePicEvent($event)" />
                     </div>
                     <div class="py-4 px-4">
                         <div class="flex mb-4">
@@ -119,7 +119,7 @@
                                 <label class="block text-grey-darker text-sm font-bold mb-2" for="first_name">
                                     Email</label>
                                 <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker"
-                                    id="first_name" type="text" placeholder="Your email"
+                                    id="first_name" type="email" placeholder="Your email"
                                     v-model="useStore.createContact.email">
                             </div>
                         </div>

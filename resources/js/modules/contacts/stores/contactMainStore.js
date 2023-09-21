@@ -8,9 +8,11 @@ import * as XLSX from 'xlsx';
 
 export const contactMainStore = defineStore("contactMainStore", () => {
 
+    const formData = new FormData();
     const useHelper = helperMainStore()
-    const createContact = ref({user_id:1})
+    const createContact = ref({ user_id: 1 })
     const contactList = ref()
+    const previewImage = ref()
     const canShowLoading = ref(false)
 
     const getContactList = () => {
@@ -23,10 +25,26 @@ export const contactMainStore = defineStore("contactMainStore", () => {
         })
     }
 
+    const profilePicEvent = (event) => {
+        let file = event.target.files[0];
+        formData.append('image', file)
+        console.log(formData);
+        console.log(createContact.value.profile_image);
+        previewImage.value = URL.createObjectURL(event.target.files[0]);
+    }
+
     const saveContact = (list) => {
         let data = []
         data.push(list)
-        axios.post("/api/createContact", data).finally(() => {
+        for (var key in createContact.value) {
+            formData.append(key, createContact.value[key]);
+        }
+        console.log(formData);
+        axios.post("/api/createContact", formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
+        }).finally(() => {
             getContactList()
         })
         createContact.value = {}
@@ -35,11 +53,10 @@ export const contactMainStore = defineStore("contactMainStore", () => {
     const selectedFile = ref()
 
     const handleFileChange = (event) => {
-
         selectedFile.value = event.target.files[0];
     }
 
-    const selected = (data) =>{
+    const selected = (data) => {
         console.log(data);
     }
 
@@ -81,7 +98,8 @@ export const contactMainStore = defineStore("contactMainStore", () => {
         }
     }
     return {
-        canShowLoading,selected,
-        contactList, createContact, getContactList, saveContact,selectedFile, handleFileChange,generateFile
+        canShowLoading, selected,
+        profilePicEvent, previewImage,
+        contactList, createContact, getContactList, saveContact, selectedFile, handleFileChange, generateFile
     }
 })

@@ -22,6 +22,12 @@ class AuthController extends Controller
             ]);
 
 
+            // Make sure it's unique
+            // while (User::where('referral_code', $referralCode)->exists()) {
+            //     $referralCode = Str::random(8);
+            // }
+
+            // $referralCode = Str::random(8);
 
 
             $user = User::create([
@@ -75,6 +81,6 @@ class AuthController extends Controller
             'exp' => time() + 3600, // Token expiration time (e.g., 1 hour)
         ];
 
-        return JWT::encode($payload, 'shelton','HS256');
+        return JWT::encode($payload, 'shelton', 'HS256');
     }
 }

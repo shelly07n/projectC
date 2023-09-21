@@ -29,11 +29,15 @@ Route::post('/createContest', [App\Http\Controllers\contestController::class, 'c
 Route::put('/updateContest/{id}', [App\Http\Controllers\contestController::class, 'updateContest']);
 Route::delete('/deleteContest/{id}', [App\Http\Controllers\contestController::class, 'deleteContest']);
 
+
+Route::post('/sentInvitation', [App\Http\Controllers\contestController::class, 'sentInvitation']);
+
 // Contestants
 Route::get('/getContestants', [App\Http\Controllers\contestantController::class, 'getContestants']);
 Route::post('/createContestant', [App\Http\Controllers\contestantController::class, 'createContestant']);
 Route::put('/updateContestant/{id}', [App\Http\Controllers\contestantController::class, 'updateContestant']);
 Route::delete('/deleteContestant/{id}', [App\Http\Controllers\contestantController::class, 'deleteContestant']);
+Route::post('/referral', [App\Http\Controllers\contestantController::class, 'findUserByReferralCode']);
 
 // Contacts
 Route::get('/getContacts', [App\Http\Controllers\contactController::class, 'getContacts']);

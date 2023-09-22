@@ -49,25 +49,30 @@ const decodedToken = ref(null);
 
 
 const decodeToken = () => {
-  const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('access_token');
 
-  try {
-    const decoded = jwt_decode(token);
+    try {
+        const decoded = jwt_decode(token);
 
-    // Display the decoded token
-    decodedToken.value = decoded;
-    useStore.decodedToken = decoded;
-    useStore.contestant.id  = decoded.user_id
-    useStore.contestant.name  = decoded.user_name
-    console.log(decoded);
-  } catch (error) {
-    console.error('Error decoding token:', error);
-  }
+        // Display the decoded token
+        decodedToken.value = decoded;
+        useStore.decodedToken = decoded;
+        useStore.contestant.id = decoded.user_id
+        useStore.contestant.name = decoded.user_name
+        console.log(decoded);
+        if (decoded.exp < Date.now() / 1000) {
+            // Token has expired, remove it from local storage
+            localStorage.removeItem('access_token');
+            // Optionally, redirect the user to the login page or take appropriate action.
+        }
+    } catch (error) {
+        console.error('Error decoding token:', error);
+    }
 };
 
-    const referDialog = ref(true)
+const referDialog = ref(true)
 
-    onMounted(() => {
-        decodeToken()
-    })
+onMounted(() => {
+    decodeToken()
+})
 </script>

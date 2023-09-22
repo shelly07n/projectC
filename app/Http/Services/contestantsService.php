@@ -33,6 +33,8 @@ class contestantsService
         $user = User::where('referral_code', $data['referral_id'])->first();
         $referral_id = $user->id;
 
+        dd($referral_id);
+
         $getCurrentReferralUser = contestants::where('referral_id',  $referral_id)->first();
 
         // dd($getconstant['current_position'] < $getCurrentReferralUser->current_position);

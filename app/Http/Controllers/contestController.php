@@ -28,7 +28,13 @@ class contestController extends Controller
     }
     public function sentInvitation(Request $request,contestService $contestService)
     {
+                // dd($request->all());
+
         $currentDomain = $request->getSchemeAndHttpHost();
-        return $contestService->sentInvitation($request->contestDetails,$request->userdetails,$currentDomain);
+        return $contestService->sentInvitation($request->contestDetails,$request->userdetails,$currentDomain,$request->currentUser);
+    }
+    public function currentStatusContest($user_id,contestService $contestService)
+    {
+        return $contestService->currentStatusContest($user_id);
     }
 }

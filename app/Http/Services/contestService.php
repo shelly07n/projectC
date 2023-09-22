@@ -4,8 +4,11 @@ namespace App\Services;
 
 use App\Mail\mailSetup;
 use App\Models\contacts;
+use App\Models\contestants;
 use App\Models\contests;
+use App\Models\referralCode;
 use App\Models\User;
+use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Session\SessionManager;
 use Illuminate\Support\Facades\Hash;
@@ -69,40 +72,63 @@ class contestService
         return response()->json(['message' => 'Contest deleted successfully']);
     }
 
-    public function sentInvitation($contestDetails, $userDetails, $currentDomain)
+    public function sentInvitation($contestDetails, $userDetails, $currentDomain, $currentUser)
     {
 
-
+        // dd($userDetails);
         $user = User::find($userDetails['user_id']);
+        $isEmpty = referralCode::count() === 0;
+        $referralCode = 'shelton' . $contestDetails['name'] . Str::random(10) . 'ton';
+        $ReferralExists = false;
+        if (!$isEmpty) {
+            $ReferralExists = referralCode::where('referral_id', $currentUser)
+                ->where('contest_id', $contestDetails['id'])
+                ->exists();
+        }
 
+        if (!$ReferralExists) {
+            $newReferral = new referralCode;
+            $newReferral->contest_id = $contestDetails['id'];
+            $newReferral->referral_id = $currentUser;
+            $newReferral->referral_code =  $referralCode;
+            $newReferral->save();
+        }
 
         $userEmail = $userDetails['email'];
 
         $subject = "Contest Invitation";
-        $userReferralCode = $user->referral_code;
+        $userReferralCode = $referralCode;
         $contestName = $contestDetails['name'];
         $contestStartDate = $contestDetails['start_date'];
         $contestEndDate = $contestDetails['end_date'];
         $contestantLimit = $contestDetails['contestant_limit'];
         $winningPrize = $contestDetails['winning_prize'];
 
-        $isSent = \Mail::to($userEmail)->send(new mailSetup(
-            $subject,
-            $userReferralCode,
-            $contestName,
-            $contestStartDate,
-            $contestEndDate,
-            $contestantLimit,
-            $winningPrize,
-            $currentDomain
-        ));
+        // $isSent = \Mail::to($userEmail)->send(new mailSetup(
+        //     $subject,
+        //     $userReferralCode,
+        //     $contestName,
+        //     $contestStartDate,
+        //     $contestEndDate,
+        //     $contestantLimit,
+        //     $winningPrize,
+        //     $currentDomain
+        // ));
 
-        if ($isSent) {
-            $contacts = contacts::find($userDetails['id']);
-            $contacts->update(['status' => 'Sent']);
-            return "mail sent";
-        } else {
-            return "not sent";
-        }
+        // if ($isSent) {
+        //     $contacts = contacts::find($userDetails['id']);
+        //     $contacts->update(['status' => 'Sent']);
+        //     return "mail sent";
+        // } else {
+        //     return "not sent";
+        // }
+    }
+
+    public function currentStatusContest( $user_id )
+    {
+        $contestant = contestants::where('user_id', $user_id)
+            ->join('contests', 'contestants.contest_id', '=', 'contests.id')
+            ->get();
+        return $contestant->toArray();
     }
 }

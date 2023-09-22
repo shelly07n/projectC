@@ -281,8 +281,9 @@ const getSeverity = (status) => {
 
 
 
-onMounted(() => {
-    useStore.getContactList()
+onMounted(async () => {
+    await useStore.getContactList()
+    useHelper.decodeToken()
 })
 
 

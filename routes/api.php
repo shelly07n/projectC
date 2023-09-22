@@ -31,6 +31,7 @@ Route::delete('/deleteContest/{id}', [App\Http\Controllers\contestController::cl
 
 
 Route::post('/sentInvitation', [App\Http\Controllers\contestController::class, 'sentInvitation']);
+Route::get('/currentStatusContest/{user_id}', [App\Http\Controllers\contestController::class, 'currentStatusContest']);
 
 // Contestants
 Route::get('/getContestants', [App\Http\Controllers\contestantController::class, 'getContestants']);
@@ -40,7 +41,7 @@ Route::delete('/deleteContestant/{id}', [App\Http\Controllers\contestantControll
 Route::post('/referral', [App\Http\Controllers\contestantController::class, 'findUserByReferralCode']);
 
 // Contacts
-Route::get('/getContacts', [App\Http\Controllers\contactController::class, 'getContacts']);
+Route::get('/getContacts/{id}', [App\Http\Controllers\contactController::class, 'getContacts']);
 Route::post('/createContact', [App\Http\Controllers\contactController::class, 'createContact']);
 Route::put('/updateContact/{id}', [App\Http\Controllers\contestantController::class, 'updateContact']);
 Route::delete('/deleteContact/{id}', [App\Http\Controllers\contestantController::class, 'deleteContact']);

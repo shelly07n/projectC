@@ -7,9 +7,9 @@ use Illuminate\Http\Request;
 
 class contactController extends Controller
 {
-    public function getContacts(Request $request, contactService $contactService)
+    public function getContacts($user_id, contactService $contactService)
     {
-        return $contactService->getContacts();
+        return $contactService->getContacts($user_id);
     }
 
     public function createContact(Request $request, contactService $contactService)

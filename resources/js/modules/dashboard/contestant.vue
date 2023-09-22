@@ -1,4 +1,5 @@
 <template>
+    contestant
 
 </template>
 

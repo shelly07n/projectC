@@ -19,10 +19,10 @@ use \DateTime;
 class contactService
 {
 
-    public function getContacts()
+    public function getContacts($user_id)
     {
 
-        $contacts = contacts::all();
+        $contacts = contacts::where('user_id', $user_id)->get();
         return $contacts->toArray();
     }
 

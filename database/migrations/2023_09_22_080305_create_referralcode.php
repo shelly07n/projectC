@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -12,19 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('contestants', function (Blueprint $table) {
+        Schema::create('referralcode', function (Blueprint $table) {
             $table->id();
-            $table->text('name');
-            $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('contest_id');
             $table->unsignedBigInteger('referral_id');
-            $table->integer('start_position')->default(99);
-            $table->integer('current_position');
+            $table->string('referral_code');
 
-            $table->foreign('user_id')
-                ->references('id')
-                ->on('users')
-                ->onDelete('cascade');
             $table->foreign('contest_id')
                 ->references('id')
                 ->on('contests')
@@ -42,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('contestants');
+        Schema::dropIfExists('referralcode');
     }
 };

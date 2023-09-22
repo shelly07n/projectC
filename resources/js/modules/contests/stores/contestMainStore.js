@@ -28,10 +28,11 @@ export const contestMainStore = defineStore("contestMainStore", () => {
         createContest.value = {}
     }
 
-    const sentInvitation = (userdetails, contestDetails) => {
+    const sentInvitation = (userdetails, contestDetails,currentUser) => {
+        console.log(currentUser);
         axios.post("/api/sentInvitation",
             {
-                userdetails, contestDetails
+                userdetails, contestDetails,currentUser
             })
     }
 

@@ -3,16 +3,66 @@ import { defineStore } from "pinia";
 import axios from "axios";
 import { ref } from "vue";
 import ExcelJS from 'exceljs';
+import jwt_decode from 'jwt-decode';
+
+import { dashboardMainStore } from '../modules/dashboard/stores/dashboardMainStore'
+import { contactMainStore } from "../modules/contacts/stores/contactMainStore";
+
 
 export const helperMainStore = defineStore("helperMainStore", () => {
 
-    const generateSampleExcel = (data,filename) => {
+
+    const useStore = dashboardMainStore()
+    const useContact = contactMainStore()
+
+    const decodedToken = ref(null);
+    const canShowReferralDialog = ref(false);
+
+
+    const decodeToken = async () => {
+        const token = localStorage.getItem('access_token');
+
+        try {
+            const decoded = jwt_decode(token);
+
+            // Display the decoded token
+            decodedToken.value = decoded;
+            useStore.decodedToken = decoded;
+            useStore.contestant.id = decoded.user_id
+            useStore.contestant.name = decoded.user_name
+            canShowReferralDialog.value = decoded.canShowReferral
+            // console.log(decoded);
+            if (decoded.exp < Date.now() / 1000) {
+                // Token has expired, remove it from local storage
+                localStorage.removeItem('access_token');
+                // Optionally, redirect the user to the login page or take appropriate action.
+            }
+
+            useStore.currentUserContestStatus(decoded.user_id)
+        } catch (error) {
+            console.error('Error decoding token:', error);
+        }
+    };
+
+
+
+
+
+
+
+
+
+
+
+
+
+    const generateSampleExcel = (data, filename) => {
 
         // Create a new workbook
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet('SampleSheet');
 
-     
+
         // Define header row style (e.g., background color and bold text)
         const headerRow = worksheet.getRow(1);
         headerRow.eachCell((cell) => {
@@ -27,12 +77,12 @@ export const helperMainStore = defineStore("helperMainStore", () => {
         });
 
         // Add headers to the worksheet
-        headerRow.values = ['firstname', 'lastname','department', 'doj','email', 'mobileNumber','designation', 'status',];
+        headerRow.values = ['firstname', 'lastname', 'department', 'doj', 'email', 'mobileNumber', 'designation', 'status',];
 
         // Add data to the worksheet
         // Add data to the worksheet
         data.forEach((row) => {
-            worksheet.addRow([row.firstname, row.lastname,row.department, row.doj,row.email, row.mobileNumber,row.designation, row.status]);
+            worksheet.addRow([row.firstname, row.lastname, row.department, row.doj, row.email, row.mobileNumber, row.designation, row.status]);
         });
 
         // Create a Blob from the workbook and initiate download
@@ -48,9 +98,10 @@ export const helperMainStore = defineStore("helperMainStore", () => {
     };
 
 
-    
+
 
     return {
+        decodedToken,decodeToken,canShowReferralDialog,
         generateSampleExcel
     }
 })

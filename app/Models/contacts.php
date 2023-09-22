@@ -29,8 +29,15 @@ class contacts extends Model
         return $this->belongsTo(User::class);
     }
 
+
+
     public function getImageUrlAttribute()
     {
         return asset('storage/' . $this->image);
+    }
+
+    public function contacts()
+    {
+        return $this->hasMany(User::class);
     }
 }

@@ -15,9 +15,9 @@ export const contactMainStore = defineStore("contactMainStore", () => {
     const previewImage = ref()
     const canShowLoading = ref(false)
 
-    const getContactList = () => {
+    const getContactList = async () => {
         canShowLoading.value = true
-        axios.get("/api/getContacts").then(res => {
+       await axios.get(`/api/getContacts/${useHelper.decodedToken ? useHelper.decodedToken.user_id : null}`).then(res => {
             console.log(res.data);
             contactList.value = res.data
         }).finally(() => {

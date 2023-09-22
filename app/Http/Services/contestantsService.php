@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Models\contestants;
 use App\Models\contests;
+use App\Models\referralCode;
 use App\Models\User;
+use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Session\SessionManager;
 use Illuminate\Support\Facades\Hash;
@@ -26,54 +28,66 @@ class contestantsService
 
     public function createContestant($data)
     {
+        // dd($data);
 
-        $getconstant  =  contestants::orderBy('id', 'DESC')->first();
+        $user = referralCode::where('referral_code', $data['referral_id'])->first();
+        $contest = contests::where('id', $user->contest_id)->first();
 
-        // dd($getconstant['current_position']);
-        $user = User::where('referral_code', $data['referral_id'])->first();
-        $referral_id = $user->id;
-
-        dd($referral_id);
-
-        $getCurrentReferralUser = contestants::where('referral_id',  $referral_id)->first();
-
-        // dd($getconstant['current_position'] < $getCurrentReferralUser->current_position);
+        $contestantLimit = $contest->contestant_limit;
+        $referral_id = $user->referral_id;
 
 
+        $isEmpty = contestants::count() === 0;
+        $getconstant  =  contestants::where('contest_id', $contest->id)->orderBy('id', 'DESC')->first();
+
+        $contestantIsExists = contestants::where('user_id', $data['id'])
+            ->where('contest_id', $user->contest_id)
+            ->exists();
 
 
-
+            // dd($contestantIsExists);
 
         if ($data) {
-            $newconstant =  new contestants;
-            // dd($getconstant['start_position']);
-            $newconstant->name = $data['name'];
-            $newconstant->contest_id = $data['contest_id'];
-            $newconstant->referral_id = $referral_id;
-            $newconstant->start_position =   empty($getconstant['start_position']) ? 99 : intval($getconstant['start_position']) + 1;
-            $newconstant->current_position =   empty($getconstant['start_position']) ? 99 :  intval($getconstant['start_position']) + 1;
-            $newconstant->save();
-            contestants::where('referral_id',  $referral_id)->where('current_position', '>', $getconstant['current_position'])->decrement('current_position', 2);
+            if (!$contestantIsExists) {
+                if (!$isEmpty) {
+                    // contestants::where('referral_id',  $referral_id)->where('current_position', '>', $getconstant['current_position'])->decrement('current_position', 1);
+                    $refer =  contestants::where('user_id', $user->referral_id)->first();
+                    if($getconstant){
+                        $refer->decrement('current_position', 1);
+                    }
+                //   dd($refer);
+                }
+                $newconstant =  new contestants;
+                $newconstant->name = $data['name'];
+                $newconstant->user_id = $data['id'];
+                $newconstant->contest_id = $contest->id;
+                $newconstant->referral_id = $referral_id;
+                $newconstant->start_position =   empty($getconstant['start_position']) ? $contestantLimit : intval($getconstant['start_position']) + 1;
+                $newconstant->current_position =   empty($getconstant['start_position']) ? $contestantLimit :  intval($getconstant['start_position']) + 1;
+                // dd($newconstant);
+                $newconstant->save();
+            } else {
+                return "Already ex";
+            }
+
+
+            // $ReferralExists = referralCode::where('contest_id', $contest->id)
+            //     ->where('referral_id', $referral_id)
+            //     ->exists();
+
+
+
             return response()->json(['message' => 'Records updated successfully'], 200);
         } else {
             return response()->json(['message' => 'Records updated failure'], 200);
         }
 
-        // foreach ($data as $data) {
-        //     if ($item) {
-        //         $newconstant =  new contestants;
-        //         // dd($getconstant['start_position']);
-        //         $newconstant->name = $item['name'];
-        //         $newconstant->contest_id = $item['contest_id'];
-        //         $newconstant->referral_id = $item['referral_id'];
-        //         $newconstant->start_position =   empty($getconstant['start_position'] )? 99 : intval($getconstant['start_position']) + 1 ;
-        //         $newconstant->current_position =   empty($getconstant['start_position'] )? 99 : intval($getconstant['start_position']) + 1 ;
-        //         $newconstant->save();
-        //         return response()->json(['message' => 'Records updated successfully'], 200);
-        //     } else {
-        //         return response()->json(['message' => 'Records updated failure'], 200);
-        //     }
-        // }
+        // dd($getconstant['current_position']);
+
+        // $getCurrentReferralUser = contestants::where('referral_id',  $referral_id)->first();
+
+        // dd($getconstant['current_position'] < $getCurrentReferralUser->current_position);
+
     }
 
 

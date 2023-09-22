@@ -4,26 +4,23 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\contests;
 
-class contestants extends Model
+class referralCode extends Model
 {
     use HasFactory;
 
-    protected $table = 'contestants';
+    protected $table = 'referralCode';
 
     protected $fillable = [
         'id',
-        'name',
-        'user_id',
         'contest_id',
         'referral_id',
-        'start_position',
-        'current_position',
+        'referral_code'
     ];
 
     public function contest()
     {
         return $this->belongsTo(contests::class);
+
     }
 }

@@ -27,4 +27,9 @@ class contests extends Model
     {
         return $this->hasOne(contestants::class);
     }
+    public function referralCode()
+    {
+        return $this->hasOne(referralCode::class);
+    }
+
 }

@@ -7,12 +7,12 @@
                     0 }}
                     Contests</p>
             </div>
-            <div class="mx-6 ">
+            <div class="mx-6 " v-if="useHelper.decodedToken">
                 <!-- <button @click="visibleImport = true"
                     class="h-10 px-5 text-indigo-700 transition-colors duration-150 border border-indigo-500 rounded-lg focus:shadow-outline hover:bg-indigo-500 hover:text-indigo-100">Import</button>
                 <button @click="useHelper.generateSampleExcel(useStore.staffList, `export_file_${new Date()}`)"
                     class="h-10 px-5 mx-2 text-indigo-700 transition-colors duration-150 border border-indigo-500 rounded-lg focus:shadow-outline hover:bg-indigo-500 hover:text-indigo-100">Export</button> -->
-                <button @click="visibleRight = true"
+                <button v-if="useHelper.decodedToken.user_role == 'admin'"  @click="visibleRight = true"
                     class="h-10 px-5 m-2 text-green-100 transition-colors duration-150 bg-green-700 rounded-lg focus:shadow-outline hover:bg-green-800">Add
                     staff</button>
             </div>
@@ -35,8 +35,8 @@
                         class="p-2 rounded-lg border bg-red-100">invite</button>
                 </template>
             </Column>
-            <Column field="created_at" header="created_at"></Column>
-            <Column field="updated_at" header="updated_at"></Column>
+            <!-- <Column field="created_at" header="created_at"></Column>
+            <Column field="updated_at" header="updated_at"></Column> -->
 
             <template #empty> No customers found. </template>
         </DataTable>
@@ -73,7 +73,7 @@
                             </div>
                             <div class="inline-flex items-center text-base font-semibold text-gray-900 ">
 
-                                <button @click="useStore.sentInvitation(contact, currentlySelectedContest)"
+                                <button @click="useStore.sentInvitation(contact, currentlySelectedContest,useDashboard.decodedToken.user_id)"
                                     class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
@@ -195,12 +195,17 @@ import { ref, onMounted } from 'vue'
 import { FilterMatchMode, FilterOperator } from 'primevue/api';
 import { contestMainStore } from './stores/contestMainStore'
 import { contactMainStore } from '../contacts/stores/contactMainStore';
+import { dashboardMainStore } from '../dashboard/stores/dashboardMainStore';
+import { helperMainStore } from '../../helpers/helperMainService';
+
 
 
 
 
 const useStore = contestMainStore()
 const useContact = contactMainStore()
+const useDashboard = dashboardMainStore()
+const useHelper = helperMainStore()
 
 const currentlySelectedContest = ref({})
 
@@ -281,9 +286,14 @@ const getSeverity = (status) => {
 
 
 
+
+
 onMounted(() => {
     useStore.getContestList()
     useContact.contactList ? null : useContact.getContactList()
+    useHelper.decodeToken()
+
+
 })
 
 

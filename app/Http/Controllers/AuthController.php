@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\contestants;
 use App\Models\User;
 use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
@@ -74,12 +75,17 @@ class AuthController extends Controller
 
     protected function generateToken($user)
     {
+
+        $canShowReferral =  contestants::where('user_id',$user->id )->exists();
         $payload = [
             'user_id' => $user->id,
             'user_name' => $user->name,
             'user_role' => $user->id == 1 ? "admin" : "contestant",
+            'canShowReferral' => $user->id == 1 ? false :  !$canShowReferral,
             'exp' => time() + 3600, // Token expiration time (e.g., 1 hour)
         ];
+
+        // dd($payload);
 
         return JWT::encode($payload, 'shelton', 'HS256');
     }

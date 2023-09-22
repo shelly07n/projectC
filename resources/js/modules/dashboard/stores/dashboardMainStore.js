@@ -6,6 +6,8 @@ export const dashboardMainStore = defineStore("dashboardMainStore", () => {
 
     const decodedToken = ref()
 
+    const currentContestStatus = ref()
+
     const referralCode = (referralCode) => {
         console.log(referralCode);
         axios.post(`/api/referral`,{referralCode:referralCode})
@@ -28,11 +30,19 @@ export const dashboardMainStore = defineStore("dashboardMainStore", () => {
         axios.post(`/api/createContestant`,contestant)
     }
 
+    const currentUserContestStatus = async (id) =>{
+        await axios.get(`/api/currentStatusContest/${id}`).then(res=>{
+            currentContestStatus.value = res.data
+        })
+    }
+
     return {
         decodedToken,
         referralCode,
         createContest,
-        contestant
+        contestant,
+        currentUserContestStatus,
+        currentContestStatus
 
     }
 })

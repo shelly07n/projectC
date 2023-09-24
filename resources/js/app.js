@@ -1,5 +1,7 @@
 import './bootstrap';
 import '../css/app.css'
+import 'animate.css';
+
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'

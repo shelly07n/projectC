@@ -36,7 +36,7 @@ const routes = [
                 component: () => import('./modules/contests/contests.vue'),
             },
             {
-                path: '/contestants',
+                path: '/contestants/:contest_id',
                 name: 'contestants',
                 component: () => import('./modules/contestants/contestants.vue'),
             },

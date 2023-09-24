@@ -1,57 +1,37 @@
 <template>
-    <!-- <loading v-if="useStore.canShowLoading" /> -->
+    <spinner v-if="useStore.canShowLoading" />
+
     <div class="w-full h-screen p-2">
         <div class="flex justify-between items-center">
             <div class="text-gray-900 font-bold text-xl mb-2">
-                <p class="text-gray-900 font-semibold text-xl mb-2">{{ useStore.contactList ? useStore.contactList.length : 0 }}
-                    Employee</p>
+                <p class="text-gray-900 font-semibold text-xl mb-2">{{ useStore.contactList ? useStore.contactList.length :
+                    0 }}
+                    Contacts</p>
             </div>
             <div class="mx-6 ">
                 <button @click="visibleImport = true"
                     class="h-10 px-5 text-indigo-700 transition-colors duration-150 border border-indigo-500 rounded-lg focus:shadow-outline hover:bg-indigo-500 hover:text-indigo-100">Import</button>
                 <button @click="useHelper.generateSampleExcel(useStore.contactList, `export_file_${new Date()}`)"
                     class="h-10 px-5 mx-2 text-indigo-700 transition-colors duration-150 border border-indigo-500 rounded-lg focus:shadow-outline hover:bg-indigo-500 hover:text-indigo-100">Export</button>
-                <button @click="visibleRight = true"
+                <button @click="useStore.canShowSidebar = true"
                     class="h-10 px-5 m-2 text-green-100 transition-colors duration-150 bg-green-700 rounded-lg focus:shadow-outline hover:bg-green-800">Add
-                    staff</button>
+                    contact</button>
             </div>
         </div>
 
-        <div class="grid grid-cols-6 gap-4 my-3" >
+        <div class="grid grid-cols-6 gap-4 my-3" v-if="useStore.contactList ? useStore.contactList.length > 0 : null">
             <div v-for="(emp, index) in useStore.contactList ">
                 <employeeCard :source="emp" :index="index" />
             </div>
         </div>
 
-
-
-        <!-- <DataTable stripedRows  v-model:filters="filters" v-model:selection="selectedCustomer" :value="useStore.contactList"  paginator :rows="5"
-        re
-         selectionMode="single" dataKey="id" tableStyle="min-width: 50rem">
-            <Column field="name" header="Name"></Column>
-            <Column field="relationship" header="relationship"></Column>
-            <Column field="dob" header="dob"></Column>
-            <Column field="mobile" header="mobile"></Column>
-            <Column field="email" header="email"></Column>
-            <Column field="status" header="status"></Column>
-            <Column field="created_at" header="created_at"></Column>
-            <Column field="updated_at" header="updated_at"></Column>
-
-            <template #empty> No customers found. </template>
-        </DataTable>-->
+        <div v-else>
+            <comingSoon />
+        </div>
 
     </div>
 
-    <!-- {{ useStore.contactList  }} -->
-
-
-
-
-
-
-
-
-    <Sidebar v-model:visible="visibleRight" position="right" class="w-full">
+    <Sidebar v-model:visible="useStore.canShowSidebar" position="right" class="w-full">
         <template #header>
             <p class="absolute left-0 mx-4 font-semibold fs-5 ">New Contact</p>
         </template>
@@ -62,7 +42,7 @@
                 <div class="w-full  bg-white rounded ">
                     <div class="profile-pic">
                         <img class="forRounded"
-                            :src=" useStore.previewImage ? useStore.previewImage :  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDnAV2195eKjdsIWb9qODnuYgxUnwJ0exESA&usqp=CAU'"
+                            :src="useStore.previewImage ? useStore.previewImage : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDnAV2195eKjdsIWb9qODnuYgxUnwJ0exESA&usqp=CAU'"
                             srcset="" alt="" id="output" width="200" />
                         <!-- <p v-else
                                 class="font-semibold text-5xl text-center flex items-center justify-center text-white forRounded"
@@ -77,7 +57,6 @@
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
                             </svg>
-                            <!-- <span>Change</span> -->
                         </label>
                         <input id="file" type="file" @change="useStore.profilePicEvent($event)" />
                     </div>
@@ -87,14 +66,14 @@
                                 <label class="block text-grey-darker text-sm font-bold mb-2" for="first_name">
                                     Name</label>
                                 <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker"
-                                    id="first_name" type="text" placeholder="Your first name"
+                                    id="first_name" type="text" placeholder="Your name"
                                     v-model="useStore.createContact.name">
                             </div>
                             <div class="w-1/2 ml-1">
                                 <label class="block text-grey-darker text-sm font-bold mb-2" for="last_name">
                                     Relationship</label>
                                 <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker"
-                                    id="last_name" type="text" placeholder="Your last name"
+                                    id="last_name" type="text" placeholder="relationship"
                                     v-model="useStore.createContact.relationship">
                             </div>
                         </div>
@@ -103,14 +82,14 @@
                                 <label class="block text-grey-darker text-sm font-bold mb-2" for="first_name">
                                     Date of birth</label>
                                 <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker"
-                                    id="first_name" type="text" placeholder="Your department"
+                                    id="first_name" type="date" placeholder="dob"
                                     v-model="useStore.createContact.dob">
                             </div>
                             <div class="w-1/2 ml-1">
                                 <label class="block text-grey-darker text-sm font-bold mb-2" for="last_name">
                                     Mobile number</label>
                                 <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker"
-                                    id="last_name" type="number" placeholder="Your date of hired"
+                                    id="last_name" type="number" placeholder="Mobile"
                                     v-model="useStore.createContact.mobile">
                             </div>
                         </div>
@@ -119,12 +98,12 @@
                                 <label class="block text-grey-darker text-sm font-bold mb-2" for="first_name">
                                     Email</label>
                                 <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker"
-                                    id="first_name" type="email" placeholder="Your email"
+                                    id="first_name" type="email" placeholder="email"
                                     v-model="useStore.createContact.email">
                             </div>
                         </div>
                         <div class="flex justify-end mx-4">
-                            <button @click="visibleRight = false, useStore.saveContact(useStore.createContact)"
+                            <button @click="useStore.canShowSidebar = false, useStore.saveContact(useStore.createContact,useStore.createContact.id)"
                                 class="h-10 px-5 m-2 text-green-100 transition-colors duration-150 bg-green-700 rounded-lg focus:shadow-outline hover:bg-green-800">Submit</button>
                         </div>
                     </div>
@@ -195,6 +174,8 @@
 <script setup>
 import employeeCard from '../../components/employeeCard.vue';
 import loading from '../../components/loading.vue';
+import spinner from '../../components/spinner.vue';
+import comingSoon from '../../components/comingsoon.vue';
 import { ref, onMounted } from 'vue'
 import { contactMainStore } from './stores/contactMainStore'
 import { helperMainStore } from '../../helpers/helperMainService';
@@ -205,85 +186,18 @@ import { FilterMatchMode, FilterOperator } from 'primevue/api';
 const useStore = contactMainStore()
 const useHelper = helperMainStore()
 
-const visibleRight = ref(false)
 const visibleImport = ref(false)
 
 
 // Define sample data
 const sample = [
-    { name: '', relationship: '', dob: '', email: '', mobile: ''},
+    { name: '', relationship: '', dob: '', email: '', mobile: '' },
 ];
-
-const customers = ref([
-    {
-        id: 1000,
-        name: 'James Butt',
-        country: {
-            name: 'Algeria',
-            code: 'dz'
-        },
-        company: 'Benton, John B Jr',
-        date: '2015-09-13',
-        status: 'unqualified',
-        verified: true,
-        activity: 17,
-        representative: {
-            name: 'Ioni Bowcher',
-            image: 'ionibowcher.png'
-        },
-        balance: 70663
-    },
-]);
-const selectedCustomer = ref();
-const filters = ref(
-    {
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        'country.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        representative: { value: null, matchMode: FilterMatchMode.IN },
-        status: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] }
-    }
-);
-const representatives = ref([
-    { name: 'Amy Elsner', image: 'amyelsner.png' },
-    { name: 'Anna Fali', image: 'annafali.png' },
-    { name: 'Asiya Javayant', image: 'asiyajavayant.png' },
-    { name: 'Bernardo Dominic', image: 'bernardodominic.png' },
-    { name: 'Elwin Sharvill', image: 'elwinsharvill.png' },
-    { name: 'Ioni Bowcher', image: 'ionibowcher.png' },
-    { name: 'Ivan Magalhaes', image: 'ivanmagalhaes.png' },
-    { name: 'Onyama Limba', image: 'onyamalimba.png' },
-    { name: 'Stephen Shaw', image: 'stephenshaw.png' },
-    { name: 'XuXue Feng', image: 'xuxuefeng.png' }
-]);
-const statuses = ref(['unqualified', 'qualified', 'new', 'negotiation', 'renewal', 'proposal']);
-
-
-
-const getSeverity = (status) => {
-    switch (status) {
-        case 'unqualified':
-            return 'danger';
-
-        case 'qualified':
-            return 'success';
-
-        case 'new':
-            return 'info';
-
-        case 'negotiation':
-            return 'warning';
-
-        case 'renewal':
-            return null;
-    }
-};
-
 
 
 onMounted(async () => {
-    await useStore.getContactList()
     useHelper.decodeToken()
+    await useStore.getContactList()
 })
 
 
@@ -357,5 +271,11 @@ $fontColor: rgb(250, 250, 250);
 .has-mask {
     position: absolute;
     clip: rect(10px, 150px, 130px, 10px);
+}
+
+/* Define the custom class and style the title */
+.my-custom-title-class {
+    font-size: 22px;
+    /* Adjust the font size to your preference */
 }
 </style>

@@ -14,17 +14,14 @@ class contestantController extends Controller
 
     public function createContestant(Request $request, contestantsService $contestantsService)
     {
-        // dd($request->all());
         return $contestantsService->createContestant($request->all());
     }
     public function updateContestant(Request $request,$id,contestantsService $contestantsService)
     {
-        // dd($request->all());
         return $contestantsService->updateContestant($request->all(),$id);
     }
     public function deleteContestant($id, contestantsService $contestantsService)
     {
-        // dd($request->all());
         return $contestantsService->deleteContestant($id);
     }
     public function findUserByReferralCode(Request $request, contestantsService $contestantsService)

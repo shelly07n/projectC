@@ -14,8 +14,11 @@ class contactController extends Controller
 
     public function createContact(Request $request, contactService $contactService)
     {
-        // dd($request->all());
         return $contactService->createContact($request->all());
+    }
+    public function createBulkContact(Request $request, contactService $contactService)
+    {
+        return $contactService->createBulkContact($request->all());
     }
 
     public function updateContact(Request $request, $id, contactService $contactService)

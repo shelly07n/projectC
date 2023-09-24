@@ -1,5 +1,10 @@
 <template>
     <!-- <loading v-if="useStore.canShowLoading" /> -->
+    <!-- <confirmationDailog /> -->
+    <Toast />
+    <ConfirmDialog></ConfirmDialog>
+    <spinner v-if="useStore.canShowLoading" />
+    <mailSuccessStatus v-if="useStore.canShowMailSuccess" />
     <div class=" h-screen p-2">
         <div class="flex justify-between items-center">
             <div class="text-gray-900 font-bold text-xl mb-2">
@@ -12,16 +17,25 @@
                     class="h-10 px-5 text-indigo-700 transition-colors duration-150 border border-indigo-500 rounded-lg focus:shadow-outline hover:bg-indigo-500 hover:text-indigo-100">Import</button>
                 <button @click="useHelper.generateSampleExcel(useStore.staffList, `export_file_${new Date()}`)"
                     class="h-10 px-5 mx-2 text-indigo-700 transition-colors duration-150 border border-indigo-500 rounded-lg focus:shadow-outline hover:bg-indigo-500 hover:text-indigo-100">Export</button> -->
-                <button v-if="useHelper.decodedToken.user_role == 'admin'"  @click="visibleRight = true"
+                <button v-if="useHelper.decodedToken.user_role == 'admin'" @click="useStore.canShowCreateContest = true"
                     class="h-10 px-5 m-2 text-green-100 transition-colors duration-150 bg-green-700 rounded-lg focus:shadow-outline hover:bg-green-800">Add
-                    staff</button>
+                    contest</button>
             </div>
         </div>
 
 
+        <div class="grid grid-cols-3 gap-4 my-3" v-if="useStore.contestList ? useStore.contestList.length > 0 : null">
+            <div v-for="(contest, index) in useStore.contestList ">
+                <contestCard :source="contest" />
+            </div>
+        </div>
+        <div v-else>
+            <comingSoon />
+        </div>
 
-        <DataTable v-model:filters="filters" v-model:selection="selectedCustomer" :value="useStore.contestList" paginator
-            responsiveLayout="scroll" :rows="5" selectionMode="single" dataKey="id" >
+
+        <DataTable v-if="false" v-model:filters="filters" v-model:selection="selectedCustomer" :value="useStore.contestList"
+            paginator responsiveLayout="scroll" :rows="5" selectionMode="single" dataKey="id">
             <Column field="name" header="Name"></Column>
             <Column field="type" header="type"></Column>
             <Column field="start_date" header="start_date"></Column>
@@ -35,19 +49,40 @@
                         class="p-2 rounded-lg border bg-red-100">invite</button>
                 </template>
             </Column>
-            <!-- <Column field="created_at" header="created_at"></Column>
-            <Column field="updated_at" header="updated_at"></Column> -->
 
             <template #empty> No customers found. </template>
         </DataTable>
     </div>
 
 
-    <Sidebar v-model:visible="visibleInvite" position="right" class="w-full">
+    <Sidebar v-model:visible="useStore.canShowSentInvitation" position="right" class="w-full">
 
         <div class="block  p-6 mb-4 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
-            <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 ">{{ currentlySelectedContest.name }}</h5>
-            <p class="font-normal text-gray-700 ">{{ currentlySelectedContest.description }}</p>
+
+            <div class="flex justify-between my-2">
+                <div>
+                    <p class="text-gray-900 font-bold text-3xl ">
+                        {{ useStore.currentlySelectedContest.name }}
+                    </p>
+                </div>
+                <div>
+                    <p class="text-gray-900 font-semibold text-xl ">
+                        {{ findContestDuration(new Date(useStore.currentlySelectedContest.start_date), new
+                            Date(useStore.currentlySelectedContest.end_date)) }} <span> days
+                            left</span>
+                    </p>
+                </div>
+            </div>
+            <div class="flex justify-between ">
+                <div>
+                    <p class="text-gray-900 font-semibold text-lg mb-2">Prize pool : <span
+                            class="font-bold text-2xl text-pink-500">
+                            {{ useStore.currentlySelectedContest.winning_prize }}</span> </p>
+                </div>
+                <!-- <div>
+                    <p class="text-gray-900 font-semibold text-xl mb-2">Master</p>
+                </div> -->
+            </div>
         </div>
         <div class="w-full p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-8">
             <div class="flex items-center justify-between mb-4">
@@ -72,8 +107,19 @@
                                 </p>
                             </div>
                             <div class="inline-flex items-center text-base font-semibold text-gray-900 ">
+                                <button v-if="contact.status == 'Sent'"
+                                    class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md">
 
-                                <button @click="useStore.sentInvitation(contact, currentlySelectedContest,useDashboard.decodedToken.user_id)"
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
+                                    </svg>
+
+                                    Sent
+                                </button>
+                                <button v-else
+                                    @click="useStore.canShowSentInvitation = false, useStore.sentInvitation(contact, useStore.currentlySelectedContest, useDashboard.decodedToken.user_id), currentlySelectedContestantName = contact.name"
                                     class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
@@ -93,7 +139,7 @@
 
 
 
-    <Sidebar v-model:visible="visibleRight" position="right" class="w-full">
+    <Sidebar v-model:visible="useStore.canShowCreateContest" position="right" class="w-full">
         <template #header>
             <p class="absolute left-0 mx-4 font-semibold fs-5 ">New contest</p>
         </template>
@@ -179,7 +225,7 @@
                                 v-model="useStore.createContest.description"></textarea>
                         </div>
                         <div class="flex justify-end mx-4">
-                            <button @click="useStore.saveContest(useStore.createContest), visibleRight = false"
+                            <button @click="useStore.saveContest(useStore.createContest,useStore.canEdit), useStore.canShowCreateContest = false"
                                 class="h-10 px-5 m-2 text-green-100 transition-colors duration-150 bg-green-700 rounded-lg focus:shadow-outline hover:bg-green-800">Submit</button>
                         </div>
                     </div>
@@ -197,6 +243,11 @@ import { contestMainStore } from './stores/contestMainStore'
 import { contactMainStore } from '../contacts/stores/contactMainStore';
 import { dashboardMainStore } from '../dashboard/stores/dashboardMainStore';
 import { helperMainStore } from '../../helpers/helperMainService';
+import contestCard from '../../components/contestCard.vue';
+import spinner from '../../components/spinner.vue';
+import mailSuccessStatus from '../../components/mailSuccessStatus.vue';
+import comingSoon from '../../components/comingsoon.vue';
+import confirmationDailog from '../../components/confirmationDailog.vue';
 
 
 
@@ -207,94 +258,28 @@ const useContact = contactMainStore()
 const useDashboard = dashboardMainStore()
 const useHelper = helperMainStore()
 
-const currentlySelectedContest = ref({})
+const currentlySelectedContestantName = ref()
 
 const visibleRight = ref(false)
 const visibleInvite = ref(false)
 const visibleImport = ref(false)
 
-
-// Define sample data
-const sample = [
-    { name: '', relationship: '', dob: '', email: '', mobile: '' },
-];
-
-const customers = ref([
-    {
-        id: 1000,
-        name: 'James Butt',
-        country: {
-            name: 'Algeria',
-            code: 'dz'
-        },
-        company: 'Benton, John B Jr',
-        date: '2015-09-13',
-        status: 'unqualified',
-        verified: true,
-        activity: 17,
-        representative: {
-            name: 'Ioni Bowcher',
-            image: 'ionibowcher.png'
-        },
-        balance: 70663
-    },
-]);
-const selectedCustomer = ref();
-const filters = ref(
-    {
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        'country.name': { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] },
-        representative: { value: null, matchMode: FilterMatchMode.IN },
-        status: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] }
-    }
-);
-const representatives = ref([
-    { name: 'Amy Elsner', image: 'amyelsner.png' },
-    { name: 'Anna Fali', image: 'annafali.png' },
-    { name: 'Asiya Javayant', image: 'asiyajavayant.png' },
-    { name: 'Bernardo Dominic', image: 'bernardodominic.png' },
-    { name: 'Elwin Sharvill', image: 'elwinsharvill.png' },
-    { name: 'Ioni Bowcher', image: 'ionibowcher.png' },
-    { name: 'Ivan Magalhaes', image: 'ivanmagalhaes.png' },
-    { name: 'Onyama Limba', image: 'onyamalimba.png' },
-    { name: 'Stephen Shaw', image: 'stephenshaw.png' },
-    { name: 'XuXue Feng', image: 'xuxuefeng.png' }
-]);
-const statuses = ref(['unqualified', 'qualified', 'new', 'negotiation', 'renewal', 'proposal']);
+const findContestDuration = (startDate, endDate) => {
+    // Calculate the difference in days
+    const timeDifference = endDate.getTime() - startDate.getTime();
+    const number_of_days = Math.ceil(timeDifference / (1000 * 3600 * 24));
+    return number_of_days;
+}
 
 
-
-const getSeverity = (status) => {
-    switch (status) {
-        case 'unqualified':
-            return 'danger';
-
-        case 'qualified':
-            return 'success';
-
-        case 'new':
-            return 'info';
-
-        case 'negotiation':
-            return 'warning';
-
-        case 'renewal':
-            return null;
-    }
-};
-
-
-
-
-
-onMounted(() => {
-    useStore.getContestList()
-    useContact.contactList ? null : useContact.getContactList()
-    useHelper.decodeToken()
-
+onMounted(async () => {
+    await useHelper.decodeToken()
+    await useContact.getContactList()
+    useStore.getContestList(useHelper.decodedToken.user_id)
 
 })
+
+
 
 
 
@@ -367,5 +352,11 @@ $fontColor: rgb(250, 250, 250);
 .has-mask {
     position: absolute;
     clip: rect(10px, 150px, 130px, 10px);
+}
+
+/* Define the custom class and style the title */
+.my-custom-title-class {
+    font-size: 22px;
+    /* Adjust the font size to your preference */
 }
 </style>

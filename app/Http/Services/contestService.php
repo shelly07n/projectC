@@ -14,27 +14,37 @@ use Illuminate\Session\SessionManager;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use \DateTime;
-
-
-
+use Illuminate\Support\Facades\DB;
 
 class contestService
 {
 
-    public function getContests()
-    {
 
+    public function getContests($user_id)
+    {
         $contests = contests::all();
-        return $contests->toArray();
+        $response = array();
+
+        foreach ($contests as $key => $item) {
+
+            $contestantIsExists = contestants::where('user_id', $user_id)
+                ->where('contest_id', $item->id)
+                ->exists();
+            if ($contestantIsExists) {
+                $item['status'] = 1;
+            } else {
+                $item['status'] = 0;
+            }
+
+            array_push($response, $item);
+        }
+
+
+        return $response;
     }
 
     public function createContest($data)
     {
-        // dd($data);
-        // $validatar = $data->validate([
-        //     'name' => 'required',
-        // ]);
-
         foreach ($data as $item) {
             if ($item) {
                 contests::create($item);
@@ -48,17 +58,9 @@ class contestService
 
     public function updateContest($data, $id)
     {
-        // dd($data['id']);
-        // $validatedData = $data->validate([
-        //     'name' => 'required|string|max:255',
-        //     // Add validation rules for other attributes as needed
-        // ]);
-
-        // Replace with the actual user ID you want to update
         $contest = contests::findOrFail($id);
-
         if ($contest) {
-            $contest->update($data);
+            $contest->update($data[0]);
             return response()->json(['message' => 'Records updated successfully'], 200);
         } else {
             return response()->json(['message' => 'Records updated failure'], 200);
@@ -74,11 +76,9 @@ class contestService
 
     public function sentInvitation($contestDetails, $userDetails, $currentDomain, $currentUser)
     {
-
-        // dd($userDetails);
-        $user = User::find($userDetails['user_id']);
+        $referralCode = '';
+        $referral = referralCode::where('referral_id', $currentUser)->first();
         $isEmpty = referralCode::count() === 0;
-        $referralCode = 'shelton' . $contestDetails['name'] . Str::random(10) . 'ton';
         $ReferralExists = false;
         if (!$isEmpty) {
             $ReferralExists = referralCode::where('referral_id', $currentUser)
@@ -87,16 +87,19 @@ class contestService
         }
 
         if (!$ReferralExists) {
+            $referralCode = 'shelton' . $contestDetails['name'] . Str::random(10) . 'ton';
             $newReferral = new referralCode;
             $newReferral->contest_id = $contestDetails['id'];
             $newReferral->referral_id = $currentUser;
             $newReferral->referral_code =  $referralCode;
             $newReferral->save();
+        }else{
+            $referralCode = $referral->referral_code;
         }
 
         $userEmail = $userDetails['email'];
 
-        $subject = "Contest Invitation";
+        $subject = "Invitation to Participate in Contest";
         $userReferralCode = $referralCode;
         $contestName = $contestDetails['name'];
         $contestStartDate = $contestDetails['start_date'];
@@ -104,31 +107,88 @@ class contestService
         $contestantLimit = $contestDetails['contestant_limit'];
         $winningPrize = $contestDetails['winning_prize'];
 
-        // $isSent = \Mail::to($userEmail)->send(new mailSetup(
-        //     $subject,
-        //     $userReferralCode,
-        //     $contestName,
-        //     $contestStartDate,
-        //     $contestEndDate,
-        //     $contestantLimit,
-        //     $winningPrize,
-        //     $currentDomain
-        // ));
+        $isSent = \Mail::to($userEmail)->send(new mailSetup(
+            $subject,
+            $userReferralCode,
+            $contestName,
+            $contestStartDate,
+            $contestEndDate,
+            $contestantLimit,
+            $winningPrize,
+            $currentDomain
+        ));
 
-        // if ($isSent) {
-        //     $contacts = contacts::find($userDetails['id']);
-        //     $contacts->update(['status' => 'Sent']);
-        //     return "mail sent";
-        // } else {
-        //     return "not sent";
-        // }
+        if ($isSent) {
+            $contacts = contacts::find($userDetails['id']);
+            $contacts->update(['status' => 'Sent']);
+            return "mail sent";
+        } else {
+            return "not sent";
+        }
     }
 
-    public function currentStatusContest( $user_id )
+    public function getCurrentUserParticipatingContests($user_id)
     {
         $contestant = contestants::where('user_id', $user_id)
             ->join('contests', 'contestants.contest_id', '=', 'contests.id')
             ->get();
-        return $contestant->toArray();
+        $contest = contests::all();
+
+        $contestResults = array();
+
+        foreach ($contest as $result) {
+            $leading =  contestants::where('contest_id', $result->id)->min('current_position');
+            $leadingContestant = contestants::where('current_position', $leading)
+                 ->join('users', 'contestants.referral_id', '=', 'users.id')
+                //  ->join('contests', 'contestants.contest_id', '=', 'contests.id')
+                ->first();
+            array_push($contestResults, $leadingContestant);
+        }
+        $response = ["contestant_status" => $contestant->toArray(), "Contest" => $contest, "contestResults" => $contestResults];
+        return  $response;
+    }
+
+    public function joinContestWithoutReferralCode($data, $user)
+    {
+        $contest = contests::where('id', $data['id'])->first();
+        $contestantLimit = $contest->contestant_limit;
+        $getConstestant  =  contestants::where('contest_id', $contest->id)->orderBy('id', 'DESC')->first();
+
+        $contestantIsExists = contestants::where('user_id', $user)
+            ->where('contest_id', $data['id'])
+            ->exists();
+
+
+        if ($data) {
+            if (!$contestantIsExists) {
+                $newconstant =  new contestants;
+                $newconstant->name = $data['name'];
+                $newconstant->user_id = $user;
+                $newconstant->contest_id = $data['id'];
+                $newconstant->referral_id = $user;
+                $newconstant->start_position =   empty($getConstestant['start_position']) ? $contestantLimit : intval($getConstestant['start_position']) + 1;
+                $newconstant->current_position =   empty($getConstestant['start_position']) ? $contestantLimit :  intval($getConstestant['start_position']) + 1;
+                // dd($newconstant);
+                $newconstant->save();
+            } else {
+                return "Already ex";
+            }
+            return response()->json(['message' => 'Records updated successfully'], 200);
+        } else {
+            return response()->json(['message' => 'Records updated failure'], 200);
+        }
+    }
+
+
+    public function getContestById($contest_id)
+    {
+        $contestant = contestants::where('contest_id', $contest_id)->orderBy('current_position', 'ASC')->get();
+
+        return $contestant;
+    }
+    public function showReferralDialog($id)
+    {
+        $canShowReferral =  contestants::where('user_id',$id )->exists();
+        return ['canShowReferral' => $id == 1 ? false :  !$canShowReferral];
     }
 }

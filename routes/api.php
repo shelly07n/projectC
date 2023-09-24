@@ -24,14 +24,17 @@ Route::post('/register', [App\Http\Controllers\AuthController::class, 'createUse
 Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
 
 // Contest
-Route::get('/getContests', [App\Http\Controllers\contestController::class, 'getContests']);
+Route::get('/getContests/{id}', [App\Http\Controllers\contestController::class, 'getContests']);
 Route::post('/createContest', [App\Http\Controllers\contestController::class, 'createContest']);
 Route::put('/updateContest/{id}', [App\Http\Controllers\contestController::class, 'updateContest']);
 Route::delete('/deleteContest/{id}', [App\Http\Controllers\contestController::class, 'deleteContest']);
 
 
+Route::post('/joinContestWithoutReferralCode', [App\Http\Controllers\contestController::class, 'joinContestWithoutReferralCode']);
 Route::post('/sentInvitation', [App\Http\Controllers\contestController::class, 'sentInvitation']);
-Route::get('/currentStatusContest/{user_id}', [App\Http\Controllers\contestController::class, 'currentStatusContest']);
+Route::get('/currentStatusContest/{user_id}', [App\Http\Controllers\contestController::class, 'getCurrentUserParticipatingContests']);
+Route::get('/getContestById/{contest_id}', [App\Http\Controllers\contestController::class, 'getContestById']);
+Route::get('/showReferralDialog/{id}', [App\Http\Controllers\contestController::class, 'showReferralDialog']);
 
 // Contestants
 Route::get('/getContestants', [App\Http\Controllers\contestantController::class, 'getContestants']);
@@ -43,7 +46,8 @@ Route::post('/referral', [App\Http\Controllers\contestantController::class, 'fin
 // Contacts
 Route::get('/getContacts/{id}', [App\Http\Controllers\contactController::class, 'getContacts']);
 Route::post('/createContact', [App\Http\Controllers\contactController::class, 'createContact']);
-Route::put('/updateContact/{id}', [App\Http\Controllers\contestantController::class, 'updateContact']);
+Route::post('/createBulkContact', [App\Http\Controllers\contactController::class, 'createBulkContact']);
+Route::put('/updateContact/{id}', [App\Http\Controllers\contactController::class, 'updateContact']);
 Route::delete('/deleteContact/{id}', [App\Http\Controllers\contestantController::class, 'deleteContact']);
 
 

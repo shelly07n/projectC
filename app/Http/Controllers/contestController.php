@@ -7,14 +7,13 @@ use Illuminate\Http\Request;
 
 class contestController extends Controller
 {
-    public function getContests(Request $request, contestService $contestService)
+    public function getContests($user_id, contestService $contestService)
     {
-        return $contestService->getContests();
+        return $contestService->getContests($user_id);
     }
 
     public function createContest(Request $request, contestService $contestService)
     {
-        // dd($request->all());
         return $contestService->createContest($request->all());
     }
     public function updateContest(Request $request, $id, contestService $contestService)
@@ -28,13 +27,23 @@ class contestController extends Controller
     }
     public function sentInvitation(Request $request,contestService $contestService)
     {
-                // dd($request->all());
-
         $currentDomain = $request->getSchemeAndHttpHost();
         return $contestService->sentInvitation($request->contestDetails,$request->userdetails,$currentDomain,$request->currentUser);
     }
-    public function currentStatusContest($user_id,contestService $contestService)
+    public function getCurrentUserParticipatingContests($user_id,contestService $contestService)
     {
-        return $contestService->currentStatusContest($user_id);
+        return $contestService->getCurrentUserParticipatingContests($user_id);
+    }
+    public function getContestById($contest_id,contestService $contestService)
+    {
+        return $contestService->getContestById($contest_id);
+    }
+    public function showReferralDialog($id,contestService $contestService)
+    {
+        return $contestService->showReferralDialog($id);
+    }
+    public function joinContestWithoutReferralCode(Request $request,contestService $contestService)
+    {
+        return $contestService->joinContestWithoutReferralCode($request->contestDetails,$request->currentUser);
     }
 }

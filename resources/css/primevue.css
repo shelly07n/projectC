@@ -1,0 +1,26 @@
+.p-progressbar.p-component.p-progressbar-determinate {
+    height: 9px;
+    /* background-color: aqua; */
+}
+
+
+.progressbar_val3 .p-progressbar-value.p-progressbar-value-animate {
+    /* background-color:#fff !important; */
+    background-color: rgb(48, 218, 48) !important;
+    color: #fff !important;
+}
+
+.progressbar .p-progressbar-value.p-progressbar-value-animate {
+    /* background-color:#fff !important; */
+    background-color: red !important;
+    color: #fff !important;
+}
+
+.progressbar_val2 .p-progressbar-value.p-progressbar-value-animate {
+    background-color: orange !important;
+    color: black !important;
+}
+
+.p-progressbar-determinate .p-progressbar-label {
+    display: none !important;
+  }

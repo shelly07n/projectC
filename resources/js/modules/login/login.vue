@@ -1,11 +1,11 @@
 <template>
+    <!-- <loginError  :source="Response"/> -->
     <!-- component -->
     <section class="flex flex-col md:flex-row h-screen items-center">
 
-        <div class="bg-indigo-600 hidden lg:block w-full md:w-1/2 xl:w-2/3 h-screen">
+        <div class=" hidden lg:block w-full md:w-1/2 xl:w-2/3 h-screen">
             <!-- <img src="https://source.unsplash.com/random" alt="" class="w-full h-full object-cover"> -->
-            <img src="https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80"
-                alt="" class="w-full h-full object-cover">
+            <img src="../../assets/login_qoutes.svg" alt="" class="w-full h-full">
         </div>
 
         <div class="bg-white w-full md:max-w-md lg:max-w-full md:mx-auto md:mx-0 md:w-1/2 xl:w-1/3 h-screen px-6 lg:px-16 xl:px-12
@@ -66,9 +66,11 @@
                     </div>
                 </button>
 
-                <p class="mt-8">Need an account? <RouterLink to="register" class="text-blue-500 hover:text-blue-700 font-semibold">Create
+                <p class="mt-8">Need an account? <RouterLink to="register"
+                        class="text-blue-500 hover:text-blue-700 font-semibold">Create
                         an
-                        account</RouterLink></p>
+                        account</RouterLink>
+                </p>
 
 
             </div>
@@ -81,32 +83,21 @@
 <script setup>
 import { useRouter, useRoute } from "vue-router";
 import axios from 'axios'
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
+import loginError from "../../components/loginError.vue";
+import Swal from "sweetalert2";
+
+
 
 const user = reactive({
     name: "",
     pass: ""
 })
 
+
+const Response = ref()
+
 const router = useRouter();
-
-
-// const login = () => {
-//     console.log(user);
-//     let name = "shelton"
-//     let pass = "root"
-
-//     if (user.name == name && user.pass == pass) {
-//         const token = localStorage.setItem('access_token', 'shelton');
-//         console.log(token);
-//         router.push('/');
-//     }
-
-// }
-
-
-
-
 const login = (username, password) => {
 
     try {
@@ -118,11 +109,39 @@ const login = (username, password) => {
             console.log(access_token);
             localStorage.setItem('access_token', access_token);
             router.push('/');
+            Swal.fire({
+                title: 'Successfully logged in',
+                icon: 'success',
+                customClass: {
+                    title: 'my-custom-title-class',
+                },
+                showClass: {
+                    popup: 'animate__animated animate__bounceIn'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__bounceOut'
+                }
+            })
+        }).catch(err => {
+            console.log(err.response.data);
+            Swal.fire({
+                title: 'Access denied',
+                text:err.response.data.message ,
+                icon: 'error',
+                customClass: {
+                    title: 'my-custom-title-class',
+                },
+                showClass: {
+                    popup: 'animate__animated animate__bounceIn'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__bounceOut'
+                }
+            })
+
         });
-
-
     } catch (error) {
-        console.error('Login failed:', error);
+        console.error('Login failed:', error.response.data);
     }
 }
 </script>
@@ -134,5 +153,11 @@ const login = (username, password) => {
     stroke-width: 20;
     stroke-linecap: round;
     stroke-miterlimit: 3;
+}
+
+/* Define the custom class and style the title */
+.my-custom-title-class {
+    font-size: 22px;
+    /* Adjust the font size to your preference */
 }
 </style>

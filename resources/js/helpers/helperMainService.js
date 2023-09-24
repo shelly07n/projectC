@@ -31,14 +31,14 @@ export const helperMainStore = defineStore("helperMainStore", () => {
             useStore.contestant.id = decoded.user_id
             useStore.contestant.name = decoded.user_name
             canShowReferralDialog.value = decoded.canShowReferral
-            // console.log(decoded);
+            console.log(decoded);
             if (decoded.exp < Date.now() / 1000) {
                 // Token has expired, remove it from local storage
                 localStorage.removeItem('access_token');
                 // Optionally, redirect the user to the login page or take appropriate action.
             }
 
-            useStore.currentUserContestStatus(decoded.user_id)
+            // useStore.currentUserContestStatus(decoded.user_id)
         } catch (error) {
             console.error('Error decoding token:', error);
         }
@@ -62,10 +62,19 @@ export const helperMainStore = defineStore("helperMainStore", () => {
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet('SampleSheet');
 
+        const headerRow = worksheet.getRow(1);
+        // Add headers to the worksheet
+        headerRow.values = ['name', 'relationship', 'dob', 'email', 'mobile'];
+
+        // Add data to the worksheet
+        // Add data to the worksheet
+        data.forEach((row) => {
+            worksheet.addRow([row.name, row.relationship, row.dob, row.email, row.mobile]);
+        });
 
         // Define header row style (e.g., background color and bold text)
-        const headerRow = worksheet.getRow(1);
-        headerRow.eachCell((cell) => {
+
+        headerRow.eachCell((cell,colNumber) => {
             cell.fill = {
                 type: 'pattern',
                 pattern: 'solid',
@@ -74,15 +83,7 @@ export const helperMainStore = defineStore("helperMainStore", () => {
             cell.font = {
                 bold: true, // Make the text bold
             };
-        });
-
-        // Add headers to the worksheet
-        headerRow.values = ['firstname', 'lastname', 'department', 'doj', 'email', 'mobileNumber', 'designation', 'status',];
-
-        // Add data to the worksheet
-        // Add data to the worksheet
-        data.forEach((row) => {
-            worksheet.addRow([row.firstname, row.lastname, row.department, row.doj, row.email, row.mobileNumber, row.designation, row.status]);
+            worksheet.getColumn(colNumber).width = 20;
         });
 
         // Create a Blob from the workbook and initiate download

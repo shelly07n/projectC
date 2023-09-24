@@ -3,6 +3,7 @@ import axios from "axios";
 import { ref } from "vue";
 import { helperMainStore } from "../../../helpers/helperMainService";
 import * as XLSX from 'xlsx';
+import Swal from "sweetalert2";
 
 
 
@@ -10,14 +11,16 @@ export const contactMainStore = defineStore("contactMainStore", () => {
 
     const formData = new FormData();
     const useHelper = helperMainStore()
-    const createContact = ref({ user_id: 1 })
+    const createContact = ref({ user_id: null })
     const contactList = ref()
+    const bulkContactList = ref([])
     const previewImage = ref()
     const canShowLoading = ref(false)
 
     const getContactList = async () => {
+        createContact.value.user_id = useHelper.decodedToken.user_id
         canShowLoading.value = true
-       await axios.get(`/api/getContacts/${useHelper.decodedToken ? useHelper.decodedToken.user_id : null}`).then(res => {
+        await axios.get(`/api/getContacts/${useHelper.decodedToken ? useHelper.decodedToken.user_id : null}`).then(res => {
             console.log(res.data);
             contactList.value = res.data
         }).finally(() => {
@@ -46,24 +49,35 @@ export const contactMainStore = defineStore("contactMainStore", () => {
             }
         }).finally(() => {
             getContactList()
+            Swal.fire({
+                title: 'Your data has been successfully saved.',
+                icon: 'success',
+                customClass: {
+                    title: 'my-custom-title-class',
+                },
+                showClass: {
+                    popup: 'animate__animated animate__bounceIn'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__bounceOut'
+                }
+            })
         })
         createContact.value = {}
     }
 
-    const selectedFile = ref()
+    const saveBulkContact = (data) => {
+        axios.post("/api/createBulkContact", data, {
+        }).finally(() => {
+            getContactList()
+        })
+    }
 
+    const selectedFile = ref()
     const handleFileChange = (event) => {
         selectedFile.value = event.target.files[0];
     }
-
-    const selected = (data) => {
-        console.log(data);
-    }
-
-
     const generateFile = () => {
-
-
         if (selectedFile.value) {
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -89,17 +103,18 @@ export const contactMainStore = defineStore("contactMainStore", () => {
                 console.log(currentSource);;
 
                 currentSource.forEach(ele => {
-                    staffList.value.push(ele)
+                    bulkContactList.value.push(ele)
                 })
-
             };
+
+            saveBulkContact(bulkContactList.value)
             reader.readAsBinaryString(selectedFile.value);
 
         }
     }
     return {
-        canShowLoading, selected,
-        profilePicEvent, previewImage,
-        contactList, createContact, getContactList, saveContact, selectedFile, handleFileChange, generateFile
+        canShowLoading,
+        contactList, createContact, saveBulkContact,bulkContactList, getContactList, saveContact, selectedFile, handleFileChange, generateFile, profilePicEvent, previewImage,
+
     }
 })

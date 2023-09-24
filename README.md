@@ -12,31 +12,27 @@
 # Step 1:
     #Create a database named "waitlist" or replace the existing database name in the .env file with "waitlist".
 
-# Step 2:
-    # Run the following command to install the necessary Node.js dependencies:
+# Step 2:Run the following command to install the necessary Node.js dependencies
+
      npm install
+     
+# Step 3:Update your PHP dependencies using Composer
 
-# Step 3:
-
-   # Update your PHP dependencies using Composer:
      composer update
 
 Step 4 (if required):
 
-    # If necessary, regenerate the Composer autoloader with the following command: 
     composer dump-autoload
 
-Step 5:
+Step 5:Run database migrations to set up the database tables
 
-    # Run database migrations to set up the database tables: 
     php artisan migrate
 
-Step 6:
+Step 6:Start the development server
 
-    Start the development server:
     php artisan serve
 
-Note: The initial user created assumes the role of an administrator, while the subsequent users are designated as contestants
+## Note: The initial user created assumes the role of an administrator, while the subsequent users are designated as contestants
 # These instructions should help you set up your project successfully.
 
 ## About Laravel

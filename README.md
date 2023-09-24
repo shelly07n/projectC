@@ -20,15 +20,15 @@
 
      composer update
 
-Step 4 (if required):
+# Step 4 (if required):
 
     composer dump-autoload
 
-Step 5:Run database migrations to set up the database tables
+# Step 5:Run database migrations to set up the database tables
 
     php artisan migrate
 
-Step 6:Start the development server
+# Step 6:Start the development server
 
     php artisan serve
 

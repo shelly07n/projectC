@@ -7,35 +7,37 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-##execution instructions
+## Execution instructions
 
-Step 1:
-    First, pull the code from the repository.
-    Create a database named "waitlist" or replace the existing database name in the .env file with "waitlist".
+# Step 1:
+    #Create a database named "waitlist" or replace the existing database name in the .env file with "waitlist".
 
-Step 2:
+# Step 2:
+    # Run the following command to install the necessary Node.js dependencies:
+     npm install
 
-    Run the following command to install the necessary Node.js dependencies:npm install
+# Step 3:
 
-Step 3:
-
-    Update your PHP dependencies using Composer: composer update
+   # Update your PHP dependencies using Composer:
+     composer update
 
 Step 4 (if required):
 
-    If necessary, regenerate the Composer autoloader with the following command: composer dump-autoload
+    # If necessary, regenerate the Composer autoloader with the following command: 
+    composer dump-autoload
 
 Step 5:
 
-    Run database migrations to set up the database tables: php artisan migrate
+    # Run database migrations to set up the database tables: 
+    php artisan migrate
 
 Step 6:
 
-    Start the development server:php artisan serve
+    Start the development server:
+    php artisan serve
 
 Note: The initial user created assumes the role of an administrator, while the subsequent users are designated as contestants
-
-These instructions should help you set up your project successfully.
+# These instructions should help you set up your project successfully.
 
 ## About Laravel
 
